@@ -10,19 +10,24 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const API = "https://my-app-be-u50p.onrender.com";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await axios.post(`${API}/api/auth/register`, {
         username,
         password,
         email,
       });
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+
+      const res = await axios.post(`${API}/api/auth/login`, {
         username,
         password,
       });
+
       localStorage.setItem("token", res.data.token);
       setMessage("Registered successfully!");
       navigate("/dashboard");
@@ -36,7 +41,6 @@ const Register = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full transform transition-all duration-500 hover:scale-105">

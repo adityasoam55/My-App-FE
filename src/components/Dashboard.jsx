@@ -12,21 +12,24 @@ const Dashboard = () => {
   const [editTask, setEditTask] = useState(null);
   const navigate = useNavigate();
 
+  const API = "https://my-app-be-u50p.onrender.com";
+
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       if (!token) return navigate("/login");
 
       try {
-        const userRes = await axios.get(
-          "http://localhost:5000/api/auth/dashboard",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setUser(userRes.data.user);
-
-        const tasksRes = await axios.get("http://localhost:5000/api/tasks", {
+        const userRes = await axios.get(`${API}/api/auth/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        setUser(userRes.data.user);
+
+        const tasksRes = await axios.get(`${API}/api/tasks`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         setTasks(tasksRes.data);
         setFilteredTasks(tasksRes.data);
       } catch (err) {
@@ -34,31 +37,37 @@ const Dashboard = () => {
         navigate("/login");
       }
     };
+
     fetchData();
   }, [navigate]);
 
   useEffect(() => {
-    let updatedTasks = tasks;
+    let updated = tasks;
+
     if (searchQuery) {
-      updatedTasks = updatedTasks.filter((task) =>
-        task.title.toLowerCase().includes(searchQuery.toLowerCase())
+      updated = updated.filter((t) =>
+        t.title.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
+
     if (filterStatus === "completed") {
-      updatedTasks = updatedTasks.filter((task) => task.completed);
+      updated = updated.filter((t) => t.completed);
     } else if (filterStatus === "pending") {
-      updatedTasks = updatedTasks.filter((task) => !task.completed);
+      updated = updated.filter((t) => !t.completed);
     }
-    setFilteredTasks(updatedTasks);
+
+    setFilteredTasks(updated);
   }, [searchQuery, filterStatus, tasks]);
 
   const handleAddTask = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+
     try {
-      const res = await axios.post("http://localhost:5000/api/tasks", newTask, {
+      const res = await axios.post(`${API}/api/tasks`, newTask, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setTasks([...tasks, res.data]);
       setNewTask({ title: "", description: "" });
     } catch (err) {
@@ -69,12 +78,14 @@ const Dashboard = () => {
   const handleEditTask = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/tasks/${editTask._id}`,
+        `${API}/api/tasks/${editTask._id}`,
         editTask,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setTasks(tasks.map((t) => (t._id === editTask._id ? res.data : t)));
       setEditTask(null);
     } catch (err) {
@@ -84,10 +95,12 @@ const Dashboard = () => {
 
   const handleDeleteTask = async (id) => {
     const token = localStorage.getItem("token");
+
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+      await axios.delete(`${API}/api/tasks/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setTasks(tasks.filter((t) => t._id !== id));
     } catch (err) {
       console.error(err);
@@ -95,21 +108,20 @@ const Dashboard = () => {
   };
 
   const handleToggleComplete = async (task) => {
-    const updatedTask = { ...task, completed: !task.completed };
+    const updated = { ...task, completed: !task.completed };
     const token = localStorage.getItem("token");
+
     try {
-      const res = await axios.put(
-        `http://localhost:5000/api/tasks/${task._id}`,
-        updatedTask,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.put(`${API}/api/tasks/${task._id}`, updated, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setTasks(tasks.map((t) => (t._id === task._id ? res.data : t)));
     } catch (err) {
       console.error(err);
     }
   };
 
-  
   if (!user)
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300">
