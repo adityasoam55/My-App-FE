@@ -37,9 +37,13 @@ const Login = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full transform transition-all duration-500 hover:scale-105">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Login
-        </h2>
+        <h2 className="text-3xl font-bold text-center text-gray-800">Login</h2>
+        <div className="text-center mb-4">
+          <p>[ Username - aman, Password - 123456 ]</p>
+          <span className="text-xs">
+            Do Not Copy Paste, Otherwise It Might Not Work
+          </span>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label
